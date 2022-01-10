@@ -44,21 +44,21 @@ async function handleMessage(client, msg) {
       const { valorAtual, valorAntigo } = await getDraco();
       const porcentagemMudanca =
         ((valorAtual - valorAntigo) / valorAntigo) * 100;
-      const mensagem = `Valor atual: ${valorAtual.toFixed(4)}
-Valor Antigo: ${valorAntigo.toFixed(4)}
+      const mensagem = `Valor atual: ${valorAtual}
+Valor Antigo: ${valorAntigo}
 Diferença: ${porcentagemMudanca.toFixed(2)} %`;
 
       await client.reply(msg.from, mensagem, msg.id);
       break;
     }
     case "comandos": {
-      await client.sendText(message.from, '🔧Os comandos são:');
-      await client.sendText(message.from, '!comandos - Mostra a lista de comandos');
-      await client.sendText(message.from, '!draco - Mostra informações da moeda Draco(Mir4)')
+      await client.sendText(msg.from, '🔧Os comandos são:');
+      await client.sendText(msg.from, '!comandos - Mostra a lista de comandos');
+      await client.sendText(msg.from, '!draco - Mostra informações da moeda Draco(Mir4)')
       break;
     }
     default: {
-      return await client.reply(msg.from, "Este comando não existe!", msg.id);
+      return await client.reply(msg.from, "Este comando não existe! Digite !comandos para ver os comandos", msg.id);
     }
   }
 }
