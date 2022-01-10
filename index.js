@@ -44,7 +44,7 @@ async function handleMessage(client, msg) {
       const { valorAtual, valorAntigo } = await getDraco();
       const porcentagemMudanca =
         ((valorAtual - valorAntigo) / valorAntigo) * 100;
-      const mensagem = `Valor atual: ${valorAtual}
+      const mensagem = `Valor Atual: ${valorAtual}
 Valor Antigo: ${valorAntigo}
 Diferença: ${porcentagemMudanca.toFixed(2)} %`;
 

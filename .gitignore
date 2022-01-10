@@ -3,6 +3,7 @@ node_modules/
 _IGNORE*/
 *.data
 *.data.json
+package-lock.json/
 
 # managed
 **.data.json
