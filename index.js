@@ -1,5 +1,5 @@
-import fetch from 'node-fetch';
-import wa from '@open-wa/wa-automate';
+import wa from "@open-wa/wa-automate";
+import axios from "axios";
 
 wa.create({
   sessionId: "WPP_BOT",
@@ -8,41 +8,66 @@ wa.create({
   blockCrashLogs: true,
   disableSpins: true,
   headless: true,
-  hostNotificationLang: 'PT_BR',
+  hostNotificationLang: "PT_BR",
   logConsole: false,
   popup: true,
   qrTimeout: 0, //0 means it will wait forever for you to scan the qr code
-}).then(client => start(client));
+}).then((client) => start(client));
+
+const prefix = "!"; // prefixo do bot
 
 function start(client) {
-  client.onMessage(async message => {
-    if (message.body == 'oi') {
-      await client.sendText(message.from, '👋 Fala mano!');
+  client.onMessage(async (msg) => await handleMessage(client, msg));
+}
+
+async function handleMessage(client, msg) {
+  // Pega a mensagem enviada, remove qualquer espaço nas pontas
+  // e deixa o conteúdo dela em minusculo
+  const bodyMsgOla = msg.body.trim().toLowerCase();
+
+  // verifica se a mensagem é "oi" ou "ola"
+  if (["oi", "ola"].includes(bodyMsgOla))
+    return await client.sendText(msg.from, "👋 Fala mano!");
+
+  // verifica se é um comando, se nao for, ignora o resto do codigo.
+  const isCommand = msg.body.startsWith(prefix);
+  if (!isCommand) return;
+
+  // pega argumentos
+  const args = msg.body.slice(prefix.length).trim().split(/ +/g);
+  // pega o comando a partir da array de argumentos acima, remove o primeiro argumento.
+  const command = args.shift().toLowerCase();
+
+  switch (command) {
+    case "drc":
+    case "draco": {
+      const { valorAtual, valorAntigo } = await getDraco();
+      const porcentagemMudanca =
+        ((valorAtual - valorAntigo) / valorAntigo) * 100;
+      const mensagem = `Valor atual: ${valorAtual.toFixed(4)}
+Valor Antigo: ${valorAntigo.toFixed(4)}
+Diferença: ${porcentagemMudanca.toFixed(2)} %`;
+
+      await client.reply(msg.from, mensagem, msg.id);
+      break;
     }
-    if (message.body === '!comandos') {
+    case "comandos": {
       await client.sendText(message.from, '🔧Os comandos são:');
       await client.sendText(message.from, '!comandos - Mostra a lista de comandos');
       await client.sendText(message.from, '!draco - Mostra informações da moeda Draco(Mir4)')
+      break;
     }
-    if (message.body === '!draco'){
-      async function getDraco () {
-        const options = {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json'
-            },
-        }
-    
-        return fetch('https://api.mir4global.com/wallet/prices/draco/lastest', options).then(data => data.json())
-      }
-    
-      const dados = await getDraco()
-      const valorMudanca = (dados.Data.USDDracoRate-dados.Data.USDDracoRatePrev)/dados.Data.USDDracoRatePrev*100
-      const dracoInfo = `Valor atual: U$${dados.Data.USDDracoRate}
-Valor anterior: U$${dados.Data.USDDracoRatePrev}
-Mudança: ${valorMudanca.toFixed(2)}%`
+    default: {
+      return await client.reply(msg.from, "Este comando não existe!", msg.id);
+    }
+  }
+}
 
-      client.sendText(message.from, dracoInfo);
-    }
-  });
+async function getDraco() {
+  const { data: dadosResponse } = await axios.post(
+    "https://api.mir4global.com/wallet/prices/draco/lastest"
+  );
+
+  const { USDDracoRate, USDDracoRatePrev } = dadosResponse.Data;
+  return { valorAtual: USDDracoRate, valorAntigo: USDDracoRatePrev };
 }
