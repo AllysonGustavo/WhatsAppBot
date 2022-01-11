@@ -12,7 +12,7 @@ wa.create({
   logConsole: false,
   popup: true,
   qrTimeout: 0, //0 means it will wait forever for you to scan the qr code
-  chromiumArgs: 'args'['--no-sandbox','--disable-setuid-sandbox']
+  chromiumArgs: 'args'['--no-sandbox','--disable-setuid-sandbox'] // pra funcionar na Heroku
 }).then((client) => start(client));
 
 const prefix = "!"; // prefixo do bot
