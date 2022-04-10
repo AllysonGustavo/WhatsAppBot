@@ -11,11 +11,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Allyson",
   "type": "module",
   "license": "ISC",
   "dependencies": {
-    "@open-wa/wa-automate": "^4.28.11",
+    "@open-wa/wa-automate": "^4.33.2",
     "axios": "^0.24.0"
   }
 }
