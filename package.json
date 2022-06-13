@@ -7,7 +7,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@open-wa/wa-automate": "^4.33.2",
-    "axios": "^0.24.0"
+    "axios": "^0.24.0",
+    "puppeteer": "2.10.0"
   }
 }
