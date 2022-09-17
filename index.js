@@ -1,9 +1,8 @@
 import wa from "@open-wa/wa-automate";
 import axios from "axios";
-import puppeteer from "puppeteer";
 
 wa.create({
-  sessionId: "WPP_BOT",
+  sessionId: "WPPBOT",
   multiDevice: true, //required to enable multiDevice support
   authTimeout: 60, //wait only 60 seconds to get a connection with the host account device
   blockCrashLogs: true,
@@ -16,6 +15,7 @@ wa.create({
   chromiumArgs: 'args'['--no-sandbox','--disable-setuid-sandbox'] // work on heroku
 }).then((client) => start(client));
 
+
 const prefix = "!"; // bot prefix
 
 function start(client) {
@@ -23,8 +23,8 @@ function start(client) {
 }
 
 async function handleMessage(client, msg) {
-  // Pega a mensagem enviada, remove qualquer espaço nas pontas
-  // e deixa o conteúdo dela em minusculo
+  // Pega a mensagem enviada, remove qualquer espaço nas pontas .trim
+  // e deixa o conteúdo dela em minusculo .toLowerCase
   const bodyMsgOla = msg.body.trim().toLowerCase();
 
   // verifica se a mensagem é "oi" ou "ola"
@@ -55,79 +55,95 @@ Diferença: ${porcentagemMudanca.toFixed(2)} %`;
     }
 
     case "habibs": {
-      await client.sendText(msg.from, "Gerando conta..._(leva em torno de 15s)_");
-      const browser = await puppeteer.launch({
-        headless: false,
-      });
-      const page = await browser.newPage();
-      // Configure the navigation timeout
-      await page.setDefaultNavigationTimeout(0);
-      // Now let's navigate
-      // Generating information
-      await page.goto('https://geradornv.com.br/gerador-pessoas/');
-      // Account name
-      await page.waitForXPath("//*[@id='nv-field-name']/text()");
-      let [nome] = await page.$x("//*[@id='nv-field-name']/text()");
-      let texto = await nome.getProperty('textContent');
-      const name = await texto.jsonValue();
+      // Let's generate
+      // Nome da Conta
+      const name = await axios.get('https://geradornv.com.br/wp-json/api/generator-people?sex=x&state=XX')
+                              .then(resp => {return resp.data.people})
       // Senha
-      const senha = 'zelele123'
+      const senha = 'zelele123';
       // CPF
-      await page.waitForXPath("//*[@id='nv-field-cpf']/text()");
-      let [nome2] = await page.$x("//*[@id='nv-field-cpf']/text()");
-      let texto2 = await nome2.getProperty('textContent');
-      const cpf = await texto2.jsonValue();
+      const n1 = Math.round(Math.random() * 9);
+      const n2 = Math.round(Math.random() * 9);
+      const n3 = Math.round(Math.random() * 9);
+      const n4 = Math.round(Math.random() * 9);
+      const n5 = Math.round(Math.random() * 9);
+      const n6 = Math.round(Math.random() * 9);
+      const n7 = Math.round(Math.random() * 9);
+      const n8 = Math.round(Math.random() * 9);
+      const n9 = Math.round(Math.random() * 6);
+      let d1 = n9 * 2 + n8 * 3 + n7 * 4 + n6 * 5 + n5 * 6 + n4 * 7 + n3 * 8 + n2 * 9 + n1 * 10;
+      d1 = 11 - (d1 % 11);
+      if (d1 >= 10) {
+          d1 = 0;
+      }
+      let d2 = d1 * 2 + n9 * 3 + n8 * 4 + n7 * 5 + n6 * 6 + n5 * 7 + n4 * 8 + n3 * 9 + n2 * 10 + n1 * 11;
+      d2 = 11 - (d2 % 11);
+      if (d2 >= 10) {
+          d2 = 0;
+      }
+      const cpf = `${n1}${n2}${n3}.${n4}${n5}${n6}.${n7}${n8}${n9}-${d1}${d2}`;
       // Email
-      await page.waitForXPath("//*[@id='nv-field-email']/text()");
-      let [nome3] = await page.$x("//*[@id='nv-field-email']/text()");
-      let texto3 = await nome3.getProperty('textContent');
-      const email = await texto3.jsonValue();
+      const names = name.split(" ");
+      const removeAccents = value=>value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+      const firstName = removeAccents(names[0]);
+      const lastName = removeAccents(names[names.length - 1]);
+      const email = `${firstName}.${lastName}@geradornv.com.br`;
       // Nascimento
-      await page.waitForXPath("//*[@id='nv-field-birthday']/text()");
-      let [nome4] = await page.$x("//*[@id='nv-field-birthday']/text()");
-      let texto4 = await nome4.getProperty('textContent');
-      const nascimento = await texto4.jsonValue();
+      const year = new Date().getFullYear() - Math.floor(Math.random() * 90) - 1;
+      const nascimento = `17/10/${year}`;
       // Celular
-      await page.waitForXPath("//*[@id='nv-field-cellphone']/text()");
-      let [nome5] = await page.$x("//*[@id='nv-field-cellphone']/text()");
-      let texto5 = await nome5.getProperty('textContent');
-      const celular = await texto5.jsonValue();
-      
+      const celular = '(11) 98811-1101';
       // Creating account
-      await page.goto('https://www.habibers.com.br/cadastro1/bibsfihagratis'); // Go to the target web
-      await page.type('#nome', name);
-      await page.type('#senha', senha);
-      await page.type('#cpf', cpf);
-      await page.type('#email', email);
-      await page.type('#data_nascimento', nascimento);
-      await page.type('#celular', celular);
+      const origem = 'bibsfihagratis'
+      const conta = {
+        origem: origem,
+        nome: name,
+        senha: senha,
+        cpf: cpf,
+        email: email,
+        data_nascimento: nascimento,
+        celular: celular,
+        checkbox_regulamento: 'on',
+        btn_cadastro: ''
+      };
 
-      // Mark the circle
-      await Promise.all([
-        await page.click('#desktop > div.div-bg-azul > div > form > div.box-regulamento > label:nth-child(2) > span')
-      ]);
-      // Click in Continue(pt: continuar)
-      await page.keyboard.press('Enter');
+      let formteste = new URLSearchParams();
 
-      await page.waitForXPath('//*[@id="modal-sucesso"]/div/div/div[1]/h5')
-      // Send the information to the user
-      await client.sendText(msg.from, "Email:" + " " + email);
-      await client.sendText(msg.from, "Senha:" + " "+ senha);
-      await client.sendText(msg.from, "Cpf:" + " " + cpf);
-      // Close the browser
-      await browser.close();
+      for (let chave in conta) { 
+        formteste.append(chave, conta[chave]) 
+      }
+
+      await axios.post('https://www.habibers.com.br/cadastro1/bibsfihagratis', formteste)
+      //await client.sendText(msg.from, `Email: ${email}`)
+      await client.sendText(msg.from, `CPF: ${cpf}`);
+      break;
+    }
+
+    case "cardapiohabibs":{
+      await client.sendImage(msg.from, 'https://i.imgur.com/RA2p0Ln.png', msg.id, 'Cardapiozinho grátis');
+      break;
+    }
+
+    case "creditos":{
+      await client.sendText(msg.from, 'Bot feito por Allyson Gustavo', msg.id);
       break;
     }
 
     case "comandos": {
-      await client.sendText(msg.from, '🔧Os comandos são:');
-      await client.sendText(msg.from, '!comandos - Mostra a lista de comandos');
-      await client.sendText(msg.from, '!draco - Mostra informações da moeda Draco(Mir4)')
-      await client.sendText(msg.from, '!habibs - cria uma conta habibs e retorna o email,senha e cpf(comida free)')
+      await client.sendText(
+          msg.from,
+          `🔧Os comandos são:
+!comandos - Mostra a lista de comandos
+!draco - Mostra informações da moeda Draco(Mir4)
+!cardapiohabibs - Mostra os itens habibs com retirada grátis
+!habibs - Cria uma conta habibs e retorna o cpf(comida grátis)
+!creditos - Exibe os creditos`, msg.id
+      )
       break;
     }
+
     default: {
-      return await client.reply(msg.from, "Este comando não existe! Digite !comandos para ver os comandos", msg.id);
+      return await client.reply(msg.from, "Este comando não existe! \nDigite !comandos para ver os comandos", msg.id);
     }
   }
 }

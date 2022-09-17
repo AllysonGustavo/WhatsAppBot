@@ -15,8 +15,7 @@
   "type": "module",
   "license": "ISC",
   "dependencies": {
-    "@open-wa/wa-automate": "^4.33.2",
-    "axios": "^0.24.0",
-    "puppeteer": "2.10.0"
+    "@open-wa/wa-automate": "^4.46.3",
+    "axios": "^0.24.0"
   }
 }
