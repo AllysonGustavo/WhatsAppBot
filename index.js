@@ -113,7 +113,7 @@ Diferença: ${porcentagemMudanca.toFixed(2)} %`;
         formteste.append(chave, conta[chave]) 
       }
 
-      await axios.post('https://www.habibers.com.br/cadastro1/bibsfihagratis', formteste)
+      await axios.post('https://habibs.alphacode.com.br/cadastro1/bibsfihagratis/', formteste)
       //await client.sendText(msg.from, `Email: ${email}`)
       await client.sendText(msg.from, `CPF: ${cpf}`);
       break;
